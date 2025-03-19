@@ -1,2 +1,5 @@
 .env
 .venv/
+./data/merged_dataset.csv
+./data/Political_Bias.csv
+./data/file_name.csv
