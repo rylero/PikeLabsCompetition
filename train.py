@@ -33,37 +33,39 @@ X_test = [text_preprocess(doc) for doc in X_test]
 ### TRAINING THE MODEL
 print("Preprocessing the data...")
 
-# tk = Tokenizer(num_words=None)
-# tk.fit_on_texts(X_train)
+'''
+tk = Tokenizer(num_words=None)
+tk.fit_on_texts(X_train)
+X_train = tk.texts_to_sequences(X_train)
+X_test = tk.texts_to_sequences(X_test)
 
-# X_train = tk.texts_to_sequences(X_train)
-# X_test = tk.texts_to_sequences(X_test)
+max_len = np.max(np.array([len(s) for s in [*X_train, *X_test]]))
+marg_len = 10
+maxlen = max_len + marg_len
 
-# max_len = np.max(np.array([len(s) for s in [*X_train, *X_test]]))
-# marg_len = 10
-# maxlen = max_len + marg_len
+X_train = pad_sequences(X_train,maxlen=maxlen)
+X_test = pad_sequences(X_test,maxlen=maxlen)
 
-# X_train = pad_sequences(X_train,maxlen=maxlen)
-# X_test = pad_sequences(X_test,maxlen=maxlen)
+embedding_dim = 100
+model = Sequential()
+model.add(Embedding(num_tokens,embedding_dim,input_length=maxlen))
+model.add(Bidirectional(LSTM(128,return_sequences=True)))
+model.add(Dropout(0.5))
+model.add(Bidirectional(LSTM(128,return_sequences=True)))
+model.add(Dropout(0.5))
+model.add(Dense(1,activation='sigmoid'))
 
-# embedding_dim = 100
-# model = Sequential()
-# model.add(Embedding(num_tokens,embedding_dim,input_length=maxlen))
-# model.add(Bidirectional(LSTM(128,return_sequences=True)))
-# model.add(Dropout(0.5))
-# model.add(Bidirectional(LSTM(128,return_sequences=True)))
-# model.add(Dropout(0.5))
-# model.add(Dense(1,activation='sigmoid'))
+print("Compiling the model...")
+model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 
-# print("Compiling the model...")
-# model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+print("Training the model...")
+model.fit(X_train,y_train,batch_size=128,epochs=10,validation_split=0.2)
 
-# print("Training the model...")
-# model.fit(X_train,y_train,batch_size=128,epochs=10,validation_split=0.2)
+print("Model Evaluation:")
+print(model.evaluate(X_test,y_test))
 
-# print("Model Evaluation:")
-# print(model.evaluate(X_test,y_test))
+model.save('model.h5')
 
-# model.save('model.h5')
+print("Model Saved")
 
-# print("Model Saved")
+'''
