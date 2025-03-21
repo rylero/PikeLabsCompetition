@@ -4,6 +4,7 @@
     "version": "1.0",
     "manifest_version": 3,
     "action": {
-        "default_popup": "test.html"
+        "default_popup": "test.html",
+        "default_icon": "placeholder.png"
     }
 }
