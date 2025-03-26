@@ -7,8 +7,9 @@
         "default_popup": "test.html",
         "default_icon": "placeholder.png"
     },
-    "background": 
+    "content_scripts": [
     {
-        "scripts": ["background.js"]
+      "js": ["content.js"]
     }
+]
 }
