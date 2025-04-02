@@ -3,12 +3,16 @@
     "description": "Scans articles",
     "version": "1.0",
     "manifest_version": 3,
+    "permissions": ["activeTab", "scripting", "storage"],
+    "background": {
+        "service_worker": "background.js"
+    },
     "action": {
-        "default_popup": "test.html",
-        "default_icon": "placeholder.png"
+        "default_popup": "popup.html"
     },
     "content_scripts": [
     {
+      "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
 ]
