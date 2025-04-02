@@ -1,3 +1,11 @@
+import re
+
+from autocorrect import Speller
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+spell = Speller(lang='en')
+lemm = WordNetLemmatizer()
 
 def reduce_lengthening(text):
     pattern = re.compile(r"(.)\1{2,}")
