@@ -1,0 +1,199 @@
+.paywall {
+  font-size: 1.1rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #353535;
+  width: 100vw;
+}
+.paywall > span {
+  padding-bottom: 10px;
+}
+
+body {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  font-family: 'Verdana', sans-serif;
+  margin: 0;
+  padding: 20px;
+  width: 400px;
+  min-height: 500px;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+  font-size: 1.5rem;
+  align-items: center;
+  height: 500px;
+  width: 100%;
+}
+
+.spinner {
+  border: 8px solid #444;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.report {
+  display: none;
+}
+
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.gauge {
+  position: relative;
+  width: 180px;
+  height: 90px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.gauge-title {
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.gauge-score {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+}
+
+.collapsible {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.collapsible:hover {
+  background-color: #353535;
+}
+
+.content {
+  padding: 0 10px;
+  display: none;
+  overflow: hidden;
+  background-color: #252525;
+  margin-bottom: 10px;
+}
+
+.carousel-section {
+  margin: 20px 0;
+}
+
+.carousel-section h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.carousel {
+  position: relative;
+  width: 360px;
+  margin: 0 auto;
+}
+
+.carousel-inner {
+  gap: 20px;
+  padding-left: 20px;
+  display: flex;
+  width: 360px;
+  overflow: hidden;
+}
+
+.carousel-item {
+  transition: transform 0.3s ease;
+  min-width: 260px;
+  height: 100%;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 15px 30px;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.carousel-item:hover {
+  background-color: #353535;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #444;
+  color: #e0e0e0;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.carousel-arrow:hover {
+  background-color: #555;
+}
+
+.carousel-arrow.left {
+  left: -30px;
+}
+
+.carousel-arrow.right {
+  right: -30px;
+}

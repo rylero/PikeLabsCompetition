@@ -1,0 +1,80 @@
+<!-- <!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+
+        <script src="../lib/lit.min.js"></script>
+        <script src="../lib/ExtPay.js"></script>
+        <script type="module" src="./popup.js"></script>
+    </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poliscan</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="paywall">
+    <span id="paywalltitle">You do not have a Politiscan account</span>
+    <button style="padding: 0.4rem 1rem; font-size: 1rem; border-radius: 10px;" id="payment-button">Pay now</button>
+    <button style="padding: 0.4rem 1rem; font-size: 1rem; border-radius: 10px;" id="freetrial-button">Activate Free Trial</button>
+    <button style="padding: 0.4rem 1rem; font-size: 1rem; border-radius: 10px;" id="login-button">Login</button>
+  </div>
+  <div class="loader">
+    <div class="spinner"></div>
+    <span id="loading-text"></span>
+  </div>
+  <div class="report">
+    <div class="gauge-container">
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;" id="bias-gauge-container">
+      <h3 class="gauge-title">Political Bias</h3>
+      <div class="gauge">
+        <canvas id="biasGauge"></canvas>
+        <div class="gauge-score" id="biasScore">Moderate</div>
+      </div>
+      <button class="collapsible">Bias Description</button>
+      <div class="content">
+        <p id="bias-content">This gauge indicates the political bias of the content, ranging from Left to Right, with Moderate being neutral. The current score suggests a balanced perspective.</p>
+      </div>
+    </div>
+
+      <h3 class="gauge-title">Credibility</h3>
+      <div class="gauge">
+        <canvas id="credibilityGauge"></canvas>
+        <div class="gauge-score" id="credibilityScore">4/5</div>
+      </div>
+      <button class="collapsible">Credibility Description</button>
+      <div class="content">
+        <p id="credibility-content">This gauge measures the credibility of the source, from 0 (low credibility) to 5 (high credibility). The current score indicates a reliable source.</p>
+      </div>
+    </div>
+    <div class="carousel-section">
+        <h3>Disagreeing Articles</h3>
+        <div class="carousel" id="disagreeingCarousel">
+          <div class="carousel-inner" id="disagreeingInner">
+          </div>
+          <button class="carousel-arrow left" id="disagree-left">‹</button>
+          <button class="carousel-arrow right" id="disagree-right">›</button>
+        </div>
+    </div>
+    <div class="carousel-section">
+      <h3>Agreeing Articles</h3>
+      <div class="carousel" id="agreeingCarousel">
+        <div class="carousel-inner" id="agreeingInner">
+        </div>
+        <button class="carousel-arrow left" id="agree-left">‹</button>
+        <button class="carousel-arrow right" id="agree-right">›</button>
+      </div>
+    </div>
+  </div>
+  <script src="../lib/ExtPay.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
