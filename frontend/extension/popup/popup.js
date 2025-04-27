@@ -194,7 +194,6 @@ function moveCarousel(type, direction) {
         console.error(`Carousel inner element not found for type: ${type}`);
         return;
     }
-
     const items = inner.querySelectorAll('.carousel-item');
     items.forEach(item => {
         item.style.transform = `translateX(-${(carousel.current * 340)}px)`;
@@ -206,7 +205,7 @@ async function startAnalyzing(tabId, url, content) {
     formData.append("url", url);
     formData.append("text", content);
 
-    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+    const jsonResult = await fetch("http://192.168.1.20:34052/generate_report", {
         method: "POST",
         body: formData,
     }).catch((err) => {
