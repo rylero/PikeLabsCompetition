@@ -14,4 +14,6 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["ls"]
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]
