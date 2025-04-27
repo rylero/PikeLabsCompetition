@@ -14,5 +14,4 @@ COPY . .
 
 EXPOSE 8000
 
-WORKDIR "/src"
-CMD ["python", "-m", "fastapi", "run", "server.py"]
+CMD ["cd", "src", "&&", "python", "-m", "fastapi", "run", "server.py"]
