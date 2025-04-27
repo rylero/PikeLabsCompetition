@@ -28,7 +28,6 @@ jobs:
         working-directory: ./backend
         run: |-
           DOCKER_TAG="ghcr.io/rylero/politiscan:latest"
-          cd backend
           docker buildx build --tag "${DOCKER_TAG}" --build-arg GROK_API="${{ secrets.GROK_API }}" --build-arg BRAVE_API="${{ secrets.BRAVE_API }}" .
           docker push "${DOCKER_TAG}"
 
