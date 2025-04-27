@@ -69,4 +69,5 @@ def getArticleAnalysis(url, text):
         )
 
     data = json.loads(response.choices[0].message.content)
+
     return data;

@@ -2,8 +2,8 @@ import sqlite3
 from typing import List, Optional
 import json, os
 
-class Database:
-    def __init__(self, filepath=os.path.abspath("../data/storage.db")) -> None:
+class AnalysisCache:
+    def __init__(self, filepath=os.path.abspath("../data/analysiscache.db")) -> None:
         self.db_conn = sqlite3.connect(filepath)
         self.cursor = self.db_conn.cursor()
 
@@ -20,11 +20,6 @@ class Database:
         return result is not None
     
     def initialize_db(self):
-        # if not self.is_database_initialized():
-        #     return
-
-        print("Initializing Database")
-
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS Articles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
