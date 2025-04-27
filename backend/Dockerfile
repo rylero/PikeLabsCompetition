@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD "ls; cd src; fastapi run server.py"
+CMD "sh -c cd src; fastapi run server.py"
