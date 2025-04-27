@@ -65,7 +65,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 	chrome.contextMenus.create({
 		id: "analyze",
 		title: "Analyze Article",
-		type: 'normal'
+		type: 'normal',
 	});
 });
 
@@ -83,7 +83,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
     formData.append("url", url);
     formData.append("text", text);
 
-    const jsonResult = await fetch("http://192.168.1.20:34052/generate_report", {
+    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
         method: "POST",
         body: formData,
     }).catch((err) => {

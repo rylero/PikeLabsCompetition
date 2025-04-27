@@ -30,7 +30,7 @@ class AnalysisCache:
                 bias REAL,
                 bias_description TEXT,
                 opposing_links TEXT,
-                agreement_links TEXT
+                agreement_links TEXT,
                 expire_date TIMESTAMP
             )
         ''')
@@ -40,33 +40,34 @@ class AnalysisCache:
     def find_article_by_url(self, url: str) -> Optional[dict]:
         self.cursor.execute('''
             SELECT id, url, factuality, factuality_description, 
-                bias, bias_description, opposing_links, agreement_links
+                bias, bias_description, opposing_links, agreement_links, expire_date
             FROM Articles 
             WHERE url = ?
         ''', (url,))
         
         result = self.cursor.fetchone()
         
-        expired = datetime.datetime.now() > result[8]
-
-        if result and not expired:
-            # Convert tuple to dictionary and parse JSON strings
-            article = {
-                'id': result[0],
-                'url': result[1],
-                'factuality': result[2],
-                'factuality_description': result[3],
-                'bias': result[4],
-                'bias_description': result[5],
-                'opposing_links': json.loads(result[6]) if result[6] else [],
-                'agreement_links': json.loads(result[7]) if result[7] else []
-            }
-            return article
+        if not result:
+            return None
+        print(result)
+        expired = datetime.datetime.now() > result[-1]
+        if expired:
+            return None
         
-        return None
+        # Convert tuple to dictionary and parse JSON strings
+        article = {
+            'id': result[0],
+            'url': result[1],
+            'factuality': result[2],
+            'factuality_description': result[3],
+            'bias': result[4],
+            'bias_description': result[5],
+            'opposing_links': json.loads(result[6]) if result[6] else [],
+            'agreement_links': json.loads(result[7]) if result[7] else []
+        }
+        return article
     
-    def generate_expire_date():
-        date = datetime.datetime.now()
+    def generate_expire_date(self):
         return datetime.datetime.now() + datetime.timedelta(days=2)
 
     def add_article(
@@ -82,7 +83,7 @@ class AnalysisCache:
         try:
             self.cursor.execute('''
                 INSERT INTO Articles (
-                    url, factuality, factuality_description, bias
+                    url, factuality, factuality_description, bias,
                     bias_description, opposing_links, agreement_links, expire_date
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (

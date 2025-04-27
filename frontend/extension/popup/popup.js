@@ -206,7 +206,7 @@ async function startAnalyzing(tabId, url, content) {
     formData.append("url", url);
     formData.append("text", content);
 
-    const jsonResult = await fetch("http://192.168.1.20:34052/generate_report", {
+    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
         method: "POST",
         body: formData,
     }).catch((err) => {
@@ -231,8 +231,6 @@ async function startAnalyzing(tabId, url, content) {
             content.style.display = content.style.display === 'block' ? 'none' : 'block';
         });
     }
-
-    console.log(analysis)
 
     showReport(analysis);
 }
@@ -276,7 +274,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             // first check ai analyzsis
             const storedAnalysis = await chrome.storage.local.get([`analysis_${tab.id}`]);
             if (storedAnalysis[`analysis_${tab.id}`]) {
-                displayAnalysis(storedAnalysis);
+                setupReportPage();
+
+                // Collapsible sections
+                const collapsibles = document.getElementsByClassName('collapsible');
+                for (let i = 0; i < collapsibles.length; i++) {
+                    collapsibles[i].addEventListener('click', function () {
+                        this.classList.toggle('active');
+                        const content = this.nextElementSibling;
+                        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                    });
+                }
+
+                showReport(storedAnalysis);
             }
 
             // Second try to get stored text
@@ -284,8 +294,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (storedText[`article_${tab.id}`]) {
                 document.getElementById('loading-text').textContent = "Article Text Loaded";
-                console.log(tab.url);
-                console.log(storedText[`article_${tab.id}`]);
                 startAnalyzing(tab.url, storedText[`article_${tab.id}`]);
             } else {
                 // If no stored text, request it from background script

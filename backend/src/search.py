@@ -13,8 +13,6 @@ class SearchRequest(BaseModel):
 def get_search_result(**kwargs):
     request = SearchRequest(**kwargs)
 
-    print("Query: " + str(request.query))
-
     url = "https://api.search.brave.com/res/v1/web/search"
     params = {"q": request.query}
     headers = {
