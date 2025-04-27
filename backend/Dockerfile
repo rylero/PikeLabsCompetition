@@ -14,4 +14,5 @@ COPY . .
 
 EXPOSE 8000
 
+CMD 'echo "test"'
 # CMD "cd src; fastapi run server.py"
