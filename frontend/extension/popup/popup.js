@@ -206,7 +206,7 @@ async function startAnalyzing(tabId, url, content) {
     formData.append("url", url);
     formData.append("text", content);
 
-    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+    const jsonResult = await fetch("http://192.168.1.20:34052/generate_report", {
         method: "POST",
         body: formData,
     }).catch((err) => {
