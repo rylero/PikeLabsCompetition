@@ -61,41 +61,41 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     return false; // Return false if not handling the message
 });
 
-// chrome.runtime.onInstalled.addListener(async () => {
-// 	chrome.contextMenus.create({
-// 		id: "analyze",
-// 		title: "Analyze Article",
-// 		type: 'normal'
-// 	});
-// });
+chrome.runtime.onInstalled.addListener(async () => {
+	chrome.contextMenus.create({
+		id: "analyze",
+		title: "Analyze Article",
+		type: 'normal'
+	});
+});
 
-// chrome.contextMenus.onClicked.addListener(async (item, tab) => {
-//     text = collectArticleText(tab.id);
+chrome.contextMenus.onClicked.addListener(async (item, tab) => {
+    text = collectArticleText(tab.id);
         
-//     if (!text) {
-//         returen;
-//     }
+    if (!text) {
+        returen;
+    }
 
-//     let url = tab.url;
-//     let tabId = tab.id;
+    let url = tab.url;
+    let tabId = tab.id;
 
-//     const formData = new FormData();
-//     formData.append("url", url);
-//     formData.append("text", text);
+    const formData = new FormData();
+    formData.append("url", url);
+    formData.append("text", text);
 
-//     const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
-//         method: "POST",
-//         body: formData,
-//     }).catch((err) => {
-//         return null;
-//     });
+    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+        method: "POST",
+        body: formData,
+    }).catch((err) => {
+        return null;
+    });
 
-//     const analysis = await jsonResult.json();
-//     console.log(analysis);
+    const analysis = await jsonResult.json();
+    console.log(analysis);
 
-//     if (analysis == undefined || analysis == null) {
-//         return;
-//     }
+    if (analysis == undefined || analysis == null) {
+        return;
+    }
 
-//     chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
-// });
+    chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
+});
