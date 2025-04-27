@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 import requests
-import json
 import os
 from dotenv import load_dotenv
 
