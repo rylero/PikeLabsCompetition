@@ -1,9 +1,9 @@
 import sqlite3
 from typing import List, Optional
-import json
+import json, os
 
 class Database:
-    def __init__(self, filepath="storage.db") -> None:
+    def __init__(self, filepath=os.path.abspath("../data/storage.db")) -> None:
         self.db_conn = sqlite3.connect(filepath)
         self.cursor = self.db_conn.cursor()
 
@@ -11,7 +11,7 @@ class Database:
 
     def is_database_initialized(self) -> bool:
         self.cursor.execute("""
-            SELECT name FROM sqlite_master 
+            SELECT name FROM sqlite_master
             WHERE type='table' AND name='Articles'
         """)
         
