@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["python", "-m", "fastapi", "run", "src/main.py"]
+CMD ["python", "-m", "fastapi", "run", "src/server.py"]
