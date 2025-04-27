@@ -1,10 +1,11 @@
 import sqlite3
 from typing import List, Optional
 import json, os
+import datetime
 
 class AnalysisCache:
     def __init__(self, filepath=os.path.abspath("../data/analysiscache.db")) -> None:
-        self.db_conn = sqlite3.connect(filepath)
+        self.db_conn = sqlite3.connect(filepath, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         self.cursor = self.db_conn.cursor()
 
         self.initialize_db()
@@ -30,6 +31,7 @@ class AnalysisCache:
                 bias_description TEXT,
                 opposing_links TEXT,
                 agreement_links TEXT
+                expire_date TIMESTAMP
             )
         ''')
 
@@ -45,7 +47,9 @@ class AnalysisCache:
         
         result = self.cursor.fetchone()
         
-        if result:
+        expired = datetime.datetime.now() > result[8]
+
+        if result and not expired:
             # Convert tuple to dictionary and parse JSON strings
             article = {
                 'id': result[0],
@@ -61,6 +65,10 @@ class AnalysisCache:
         
         return None
     
+    def generate_expire_date():
+        date = datetime.datetime.now()
+        return datetime.datetime.now() + datetime.timedelta(days=2)
+
     def add_article(
         self,
         url: str,
@@ -74,9 +82,9 @@ class AnalysisCache:
         try:
             self.cursor.execute('''
                 INSERT INTO Articles (
-                    url, factuality, factuality_description, 
-                    bias, bias_description, opposing_links, agreement_links
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    url, factuality, factuality_description, bias
+                    bias_description, opposing_links, agreement_links, expire_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 url,
                 factuality,
@@ -84,7 +92,8 @@ class AnalysisCache:
                 bias,
                 bias_description,
                 json.dumps(opposing_links) if opposing_links else None,
-                json.dumps(agreement_links) if agreement_links else None
+                json.dumps(agreement_links) if agreement_links else None,
+                self.generate_expire_date()
             ))
             
             self.db_conn.commit()
