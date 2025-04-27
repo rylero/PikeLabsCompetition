@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD "sh -c cd src; fastapi run server.py"
+CMD ["python", "-m", "fastapi", "run", "src/main.py"]
