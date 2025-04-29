@@ -14,7 +14,7 @@ def get_search_result(**kwargs):
     request = SearchRequest(**kwargs)
 
     url = "https://api.search.brave.com/res/v1/web/search"
-    params = {"q": request.query}
+    params = { "q": request.query, "summary": True }
     headers = {
         "X-Subscription-Token": BRAVE_API_KEY
     }

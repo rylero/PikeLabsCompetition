@@ -52,6 +52,7 @@ class AnalysisCache:
         print(result)
         expired = datetime.datetime.now() > result[-1]
         if expired:
+            # TODO: Delete article that is expired from database, prevent large cache file
             return None
         
         # Convert tuple to dictionary and parse JSON strings

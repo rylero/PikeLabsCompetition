@@ -9,10 +9,12 @@ let email = "leroy.ryan09@gmail.com";
 let url = window.location.href;
 
 const buttonSubmit = () => {
-    const ws = new WebSocket("ws://192.168.1.20:34052");
+    const ws = new WebSocket("ws://0.0.0.0:8000/chat");
 
     ws.send({
-        inital
+        email: email,
+        url: url,
+        text: ""
     })
 }
 
