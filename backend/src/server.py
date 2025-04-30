@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json, time
 from fastapi.params import Form
 
+from transcription import get_transcription
 from cache import AnalysisCache
 from ai import grokClient, tools_definition, tools_map, getArticleAnalysis
 from chat import ChatMessageHistoryDB
@@ -58,7 +59,11 @@ async def generate_report(url: Annotated[str, Form()], text: Annotated[str, Form
         data["agreement_links"],
     )
 
-    return data;
+    return data
+
+@app.post("/get_captions")
+async def get_captions(url: Annotated[str, Form()]):
+    return get_transcription(url)
 
 @app.websocket("/chat")
 async def chat_endpoint(websocket: fastapi.WebSocket):
