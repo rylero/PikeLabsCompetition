@@ -25,4 +25,5 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] YouTube/video caption downloader?
 - [ ] Chat Feature to ask questions about an article
 - [ ] Reduce context window size from tool call by cutting uneccesary info
+- [ ] Use Brave news search for more sources and combine with url text api
 - [ ] Switch to structured response format to prevent JSON format errors
