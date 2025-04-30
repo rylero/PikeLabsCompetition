@@ -15,14 +15,14 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 | GROK-3-Mini-Fast (chosen model)    | 28.46s |https://file+.vscode-resource.vscode-cdn.net/Users/ryanleroy/PikeLabsCompetition/docs/structure.excalidraw.svg
 
 ### Possible Features / TODOs
-- Improve Text grabbing functionality
-- Fix bug where bias and factuality descriptions don't display
-- Fix inital article click where it says "No article text found on this page"
-- Select the context menu for text grabbing
-- Better loading menu / fix flow errors
-- Cleaner UI
-- Check mobile responsiveness, possibly different mobile interactions, like a new page
-- YouTube/video caption downloader?
-- Chat Feature to ask questions about an article
-- Reduce context window size from tool call by cutting uneccesary info
-- Switch to structured response format to prevent JSON format errors
+- [ ] Improve Text grabbing functionality
+- [ ] Fix bug where bias and factuality descriptions don't display
+- [ ] Fix inital article click where it says "No article text found on this page"
+- [ ] Select the context menu for text grabbing
+- [ ] Better loading menu / fix flow errors
+- [ ] Cleaner UI
+- [ ] Check mobile responsiveness, possibly different mobile interactions, like a new page
+- [ ] YouTube/video caption downloader?
+- [ ] Chat Feature to ask questions about an article
+- [ ] Reduce context window size from tool call by cutting uneccesary info
+- [ ] Switch to structured response format to prevent JSON format errors
