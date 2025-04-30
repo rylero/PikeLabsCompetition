@@ -19,13 +19,13 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] Fix bug where bias and factuality descriptions don't display
 - [ ] Fix inital article click where it says "No article text found on this page" (Shaun)
 - [ ] Select the context menu for text grabbing
+- [ ] Automatic Page loading on popular new sites
 - [ ] Better loading menu / fix flow errors
 - [ ] Cleaner UI
-- [ ] Check mobile responsiveness, possibly different mobile interactions, like a new page
-- [ ] YouTube/video caption downloader?
-- [ ] Chat Feature to ask questions about an article (Ryan)
-- [ ] Reduce context window size from tool call by cutting uneccesary info (Ryan)
-- [ ] Use Brave news search for more sources and combine with url text api (Ryan)
+- [ ] YouTube/video caption downloader? (Nathan)
+- [ ] Chat Feature to ask questions about an article
+- [ ] Reduce context window size from tool call by cutting unnecessary info (Ryan)
+- [ ] Use Brave news search for more sources and combine with URL text api (Ryan)
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
 
 ### Possible Technologies
