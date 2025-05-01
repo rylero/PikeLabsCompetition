@@ -1,51 +1,32 @@
 from pydantic import BaseModel, Field
-import requests
-import os, json
 from dotenv import load_dotenv
-from readabilipy import simple_json_from_html_string
+from tavily import TavilyClient
+import os
 
 load_dotenv()
-
-BRAVE_API_KEY = os.getenv("BRAVE_API")
 
 class SearchRequest(BaseModel):
     query: str = Field(description="string to search brave search api with for search results")
 
-def article_text(url):
-    res = requests.get(url)
-    article = simple_json_from_html_string(res.text, use_readability=True)
-    selected_features = {}
-    selected_features["byline"] = article["byline"]
-    selected_features["content"] = article["content"]
-    return selected_features
+client = TavilyClient(api_key=os.getenv("TAVILY_API"))
+
+def get_article_text(urls):
+    return client.extract(urls=urls, extract_depth="advanced")
+
+def compress(data):
+    s = ""
+    for row in data:
+        s += "Article\n"
+        s += f"Url: {row['url']}\n"
+        s += f"Title: {row['title']}\n"
+        s += f"Date: {row['published_date']}\n"
+        s += f"Content: {row['content']}\n\n"
+    return s
 
 def get_search_result(**kwargs):
     request = SearchRequest(**kwargs)
 
-    url = "https://api.search.brave.com/res/v1/web/search"
-    params = { "q": request.query, "summary": True, "count": 10 }
-    headers = {
-        "X-Subscription-Token": BRAVE_API_KEY
-    }
-    response = requests.get(url, params=params, headers=headers)
-
-    json = response.json()
-
-    data = []
-    for result in json["web"]["results"]:
-        article = {}
-        if "title" in result:
-            article["title"] = result["title"]
-        if "description" in result:
-            article["description"] = result["description"]
-        if "url" in result:
-            article["url"] = result["url"]
-        if "age" in result:
-            article["page_age"] = result["age"]
-        # article["text_processor_out"] = article_text(result["url"])
-        data.append(article)
-        print("Article len: " + str(len(str(article))))
-    return data
-
+    query = request.query
+    return compress(client.search(query, topic="news", max_results=5, search_depth="advanced")["results"])
 
 get_search_result_schema = SearchRequest.model_json_schema()

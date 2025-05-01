@@ -49,7 +49,6 @@ class AnalysisCache:
         
         if not result:
             return None
-        print(result)
         expired = datetime.datetime.now() > result[-1]
         if expired:
             # TODO: Delete article that is expired from database, prevent large cache file

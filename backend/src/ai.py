@@ -1,4 +1,4 @@
-from search import get_search_result, get_search_result_schema
+from search import get_search_result_schema, get_search_result
 import os, json
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -11,7 +11,7 @@ tools_definition = [
         "type": "function",
         "function": {
             "name": "get_search_result",
-            "description": "Gets search results of only news articles from the brave search api.",
+            "description": "Gets search results of only news articles from the tavily search api.",
             "parameters": get_search_result_schema,
         },
     },
@@ -57,11 +57,13 @@ def getArticleAnalysis(url, text):
             function_args = json.loads(tool_call.function.arguments)
 
             result = tools_map[function_name](**function_args)
+            with open(f"{len(result)}.txt", "w") as f:
+                f.write(result)
 
             messages.append(
                 {
                     "role": "tool",
-                    "content": json.dumps(result),
+                    "content": result,
                     "tool_call_id": tool_call.id  # tool_call.id supplied in Grok's response
                 }
             )
@@ -77,6 +79,7 @@ def getArticleAnalysis(url, text):
             tool_choice="auto"
         )
         print(f"Last Response: {time.time() - last_time}s")
+        print(response.choices[0].message.content)
         last_time = time.time()
 
     data = json.loads(response.choices[0].message.content)
