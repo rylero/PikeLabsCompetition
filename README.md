@@ -1,7 +1,7 @@
 # Politiscan
 
 ### Project Structure
-![Diagram of Project Structure](docs/diagram.excalidraw.svg | width=500)
+![Diagram of Project Structure](docs/diagram.excalidraw.svg)
 
 ### API Choice
 For this extension we use GROK completion with custom Brave Search API tooling
