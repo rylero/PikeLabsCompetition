@@ -66,7 +66,7 @@ function showReport(data) {
     drawGauge(document.getElementById('biasGauge'), data.bias, 6, ['#1e88e5', '#4caf50', '#d81b60'], true);
     drawGauge(document.getElementById('credibilityGauge'), data.factuality, 6, ['#d81b60', '#4caf50']);
 
-    document.getElementById("bias-gauge-container").display = data["show-bias"] ? 'block' : 'none';
+    document.getElementById("bias-gauge-container").display = data["show_bias"] ? 'block' : 'none';
     document.getElementById("credibility-content").textContent = data.factuality_description;
     document.getElementById("bias-content").textContent = data.bias_description;
 

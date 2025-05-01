@@ -52,9 +52,9 @@ async def generate_report(url: Annotated[str, Form()], text: Annotated[str, Form
     analysis_cache.add_article(
         url,
         data["factuality"],
-        data["factuality-description"],
+        data["factuality_description"],
         data["bias"],
-        data["bias-description"],
+        data["bias_description"],
         data["opposing_links"],
         data["agreement_links"],
     )

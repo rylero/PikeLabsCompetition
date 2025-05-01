@@ -25,8 +25,10 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] YouTube/video caption downloader? (Nathan)
 - [ ] Chat Feature to ask questions about an article
 - [ ] Reduce context window size from tool call by cutting unnecessary info (Ryan)
-- [ ] Use Brave news search for more sources and combine with URL text api (Ryan)
+- [x] Use Tavily search for better research (Ryan)
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
+- [ ] Add Show_Bias to analysis cachew
+- [ ] Preload common articles for better UX
 
 ### Possible Technologies
 - Readability API for extracting article text in a much more sofiticated manner: https://github.com/mozilla/readability
