@@ -201,18 +201,36 @@ function moveCarousel(type, direction) {
 }
 
 async function startAnalyzing(tabId, url, content) {
-    const formData = new FormData();
-    formData.append("url", url);
-    formData.append("text", content);
+    console.log(tabId, url, content)
+    let jsonResult = undefined;
 
-    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
-        method: "POST",
-        body: formData,
-    }).catch((err) => {
-        return null;
-    });
+    console.log(url);
+
+    if (url.startsWith("https://www.youtube.com/watch")) {
+        const formData = new FormData();
+        formData.append("url", url);
+
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
+            method: "POST",
+            body: formData,
+        }).catch((err) => {
+            return null;
+        });
+    } else {
+        const formData = new FormData();
+        formData.append("url", url);
+        formData.append("text", content);
+
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+            method: "POST",
+            body: formData,
+        }).catch((err) => {
+            return null;
+        });
+    }
 
     const analysis = await jsonResult.json();
+    console.log(analysis)
 
     if (analysis == undefined || analysis == null) {
         document.getElementById('loading-text').textContent = "Analysis Failed";
@@ -285,7 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 }
 
-                showReport(storedAnalysis);
+                showReport(storedAnalysis[`analysis_${tab.id}`]);
             }
 
             // Second try to get stored text
@@ -305,7 +323,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('loading-text').textContent = "Article Text Loaded";
                     startAnalyzing(tab.id, tab.url, response.text);
                 } else {
-                    document.getElementById('loading-text').textContent = 'No article text found on this page.';
+                    if (tab.url.startsWith("https://www.youtube.com/watch")) {
+                        document.getElementById('loading-text').textContent = 'Analyzing Youtube Captions';
+                        startAnalyzing(tab.id, tab.url, null);
+                    } else {
+                        document.getElementById('loading-text').textContent = 'No article text found on this page.';
+                    }
                 }
             }
         } catch (err) {

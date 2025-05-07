@@ -70,25 +70,39 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (item, tab) => {
-    text = collectArticleText(tab.id);
-        
-    if (!text) {
-        returen;
-    }
-
     let url = tab.url;
     let tabId = tab.id;
 
-    const formData = new FormData();
-    formData.append("url", url);
-    formData.append("text", text);
+    let jsonResult = undefined;
 
-    const jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
-        method: "POST",
-        body: formData,
-    }).catch((err) => {
-        return null;
-    });
+    if (url.startsWith("https://www.youtube.com/watch")) {
+        const formData = new FormData();
+        formData.append("url", url);
+
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
+            method: "POST",
+            body: formData,
+        }).catch((err) => {
+            return null;
+        });
+    } else {
+        text = collectArticleText(tab.id);
+        
+        if (!text) {
+            returen;
+        }
+
+        const formData = new FormData();
+        formData.append("url", url);
+        formData.append("text", text);
+
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+            method: "POST",
+            body: formData,
+        }).catch((err) => {
+            return null;
+        });
+    }
 
     const analysis = await jsonResult.json();
     console.log(analysis);

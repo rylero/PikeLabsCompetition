@@ -59,9 +59,31 @@ async def generate_report(url: Annotated[str, Form()], text: Annotated[str, Form
 
     return data
 
-@app.post("/get_captions")
+@app.post("/generate_report_from_youtube")
 async def get_captions(url: Annotated[str, Form()]):
-    return get_transcription(url)
+    text = get_transcription(url)
+
+    if cached_analysis := analysis_cache.find_article_by_url(url):
+        cached_analysis.pop("id")
+        cached_analysis.pop("url")
+        return cached_analysis
+
+    data = getArticleAnalysis(url, text)
+
+    if not data:
+        raise fastapi.HTTPException(status_code=500, detail="Internal Server Error.")
+
+    analysis_cache.add_article(
+        url,
+        data["factuality"],
+        data["factuality_description"],
+        data["bias"],
+        data["bias_description"],
+        data["opposing_links"],
+        data["agreement_links"],
+    )
+
+    return data
 
 @app.websocket("/chat")
 async def chat_endpoint(websocket: fastapi.WebSocket):

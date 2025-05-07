@@ -47,7 +47,6 @@ def getArticleAnalysis(url, text):
     )
 
     messages.append(response.choices[0].message)
-    last_time = time.time()
 
     while response.choices[0].message.tool_calls:
         i = 1
@@ -65,9 +64,6 @@ def getArticleAnalysis(url, text):
                     "tool_call_id": tool_call.id  # tool_call.id supplied in Grok's response
                 }
             )
-
-            print(f"Tool Call #{i}: {time.time() - last_time}s")
-            last_time = time.time()
             i+=1
 
         response = grokClient.chat.completions.create(
