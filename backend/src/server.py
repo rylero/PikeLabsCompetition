@@ -37,12 +37,10 @@ def read_root():
 
 @app.post("/generate_report")
 async def generate_report(url: Annotated[str, Form()], text: Annotated[str, Form()]):
-    start = time.time()
     if cached_analysis := analysis_cache.find_article_by_url(url):
         cached_analysis.pop("id")
         cached_analysis.pop("url")
         return cached_analysis
-    print(f"Cache Check: {time.time() - start}s")
 
     data = getArticleAnalysis(url, text)
 

@@ -47,7 +47,6 @@ def getArticleAnalysis(url, text):
     )
 
     messages.append(response.choices[0].message)
-    print(f"First Response: {time.time() - last_time}s")
     last_time = time.time()
 
     while response.choices[0].message.tool_calls:
@@ -58,8 +57,6 @@ def getArticleAnalysis(url, text):
             function_args = json.loads(tool_call.function.arguments)
 
             result = tools_map[function_name](**function_args)
-            with open(f"{len(result)}.txt", "w") as f:
-                f.write(result)
 
             messages.append(
                 {
@@ -79,7 +76,7 @@ def getArticleAnalysis(url, text):
             tools=tools_definition,
             tool_choice="auto"
         )
-        print(f"Response: {time.time() - last_time}s")
+        messages.append(response.choices[0].message)
         last_time = time.time()
 
     data = json.loads(response.choices[0].message.content)

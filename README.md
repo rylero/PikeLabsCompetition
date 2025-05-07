@@ -26,6 +26,7 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] Chat Feature to ask questions about an article
 - [ ] Reduce context window size from tool call by cutting unnecessary info (Ryan)
 - [x] Use Tavily search for better research (Ryan)
+- [ ] Speed up request by reducing the number of tool calls
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
 - [ ] Add Show_Bias to analysis cachew
 - [ ] Preload common articles for better UX
