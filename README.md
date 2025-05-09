@@ -23,7 +23,7 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] Cleaner UI
 - [x] YouTube/video caption downloader? (Nathan + Ryan)
 - [ ] Chat Feature to ask questions about an article (Ryan)
-- [ ] Reduce context window size from tool call by cutting unnecessary info (Ryan)
+- [x] Reduce context window size from tool call by cutting unnecessary info (Ryan)
 - [x] Use Tavily search for better research (Ryan)
 - [x] Speed up request by reducing the number of tool calls (Ryan)
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
