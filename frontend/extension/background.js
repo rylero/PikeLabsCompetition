@@ -43,10 +43,54 @@ async function collectArticleText(tabId) {
     }
 }
 
+let newsSites = [
+    "newsweek.com",
+    "foxnews.com",
+    "cnn.com",
+    "nytimes.com",
+    "washingtonpost.com",
+    "bbc.com",
+    "reuters.com",
+    "apnews.com",
+];
+
 // Listen for tab updates
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.url && !tab.url.startsWith('chrome://')) {
-        await collectArticleText(tabId);
+        let text = await collectArticleText(tabId);
+
+        if (!text) {
+            return;
+        }
+
+        let isNews = false;
+        newsSites.forEach((a) => {
+            if (tab.url.includes(a)) {
+                isNews = true;
+            }
+        })
+        if (isNews) {
+            console.log("News site openened");
+        }
+
+        const formData = new FormData();
+        formData.append("url", tab.url);
+        formData.append("text", text);
+
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+            method: "POST",
+            body: formData,
+        }).catch((err) => {
+            return null;
+        });
+
+        const analysis = await jsonResult.json();
+
+        if (analysis == undefined || analysis == null) {
+            return;
+        }
+
+        chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
     }
 });
 
@@ -86,7 +130,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
             return null;
         });
     } else {
-        text = collectArticleText(tab.id);
+        let text = collectArticleText(tab.id);
         
         if (!text) {
             returen;

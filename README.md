@@ -23,13 +23,13 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] Better loading menu / fix flow errors
 - [ ] Cleaner UI
 - [x] YouTube/video caption downloader? (Nathan + Ryan)
-- [ ] Chat Feature to ask questions about an article
+- [ ] Chat Feature to ask questions about an article (Ryan)
 - [ ] Reduce context window size from tool call by cutting unnecessary info (Ryan)
 - [x] Use Tavily search for better research (Ryan)
 - [x] Speed up request by reducing the number of tool calls (Ryan)
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
-- [ ] Add Show_Bias to analysis cachew
-- [ ] Preload common articles for better UX
+- [ ] Add Show_Bias to analysis cache
+- [ ] Preload common articles for better UX (Ryan)
 
 ### Possible Technologies
 - Readability API for extracting article text in a much more sofiticated manner: https://github.com/mozilla/readability
