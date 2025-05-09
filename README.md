@@ -29,7 +29,7 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [x] Speed up request by reducing the number of tool calls (Ryan)
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
 - [ ] Add Show_Bias to analysis cache
-- [ ] Preload common articles for better UX (Ryan)
+- [x] Preload common articles for better UX (Ryan)
 
 ### Possible Technologies
 - Readability API for extracting article text in a much more sofiticated manner: https://github.com/mozilla/readability
