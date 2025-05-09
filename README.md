@@ -19,7 +19,6 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] Fix bug where bias and factuality descriptions don't display
 - [ ] Fix inital article click where it says "No article text found on this page" (Shaun)
 - [ ] Select the context menu for text grabbing
-- [ ] Automatic Page loading on popular new sites
 - [ ] Better loading menu / fix flow errors
 - [ ] Cleaner UI
 - [x] YouTube/video caption downloader? (Nathan + Ryan)
@@ -30,6 +29,3 @@ Speed Comparison of Models (based on analysis of this article https://www.npr.or
 - [ ] Switch to structured response format to prevent JSON format errors (Ryan)
 - [ ] Add Show_Bias to analysis cache
 - [x] Preload common articles for better UX (Ryan)
-
-### Possible Technologies
-- Readability API for extracting article text in a much more sofiticated manner: https://github.com/mozilla/readability
