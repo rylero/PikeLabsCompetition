@@ -8,7 +8,7 @@ load_dotenv()
 class SearchRequest(BaseModel):
     queries: list[str] = Field(description="list of queries to run through the tavily search api")
 
-client = TavilyClient(api_key=os.getenv("TAVILY_API"))
+client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 def get_article_text(urls):
     return client.extract(urls=urls, extract_depth="advanced")
