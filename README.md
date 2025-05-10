@@ -1,6 +1,5 @@
 <img src="docs/banner.jpg" alt="Politiscan banner" width="100%">
 
-### Project Structure
 ![Diagram of Project Structure](docs/diagram.excalidraw.svg)
 
 ### Technology Decisions
