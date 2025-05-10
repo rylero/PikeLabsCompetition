@@ -22,7 +22,7 @@ body {
   font-family: 'Verdana', sans-serif;
   margin: 0;
   padding: 20px;
-  width: 400px;
+  width: 600px;
   min-height: 500px;
 }
 
@@ -208,17 +208,37 @@ canvas {
   background-color: #2a2a2a;
   border-radius: 5px;
   padding: 15px;
-  width: 360px;
+  width: 500px;
   margin: 0 auto;
 }
 
 .chat-messages {
-  max-height: 200px;
+  /* max-height: 200px; */
   overflow-y: auto;
   margin-bottom: 10px;
   padding: 10px;
   background-color: #252525;
   border-radius: 5px;
+}
+
+.chat-message {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 5px;
+  max-width: 80%;
+  width: fit-content;
+  word-wrap: break-word;
+}
+
+.chat-message.system {
+  background-color: #353535;
+  margin-right: auto;
+}
+
+.chat-message.user {
+  background-color: #444;
+  margin-left: auto;
+  text-align: right;
 }
 
 .chat-input {

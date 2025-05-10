@@ -72,6 +72,17 @@ class AnalysisCache:
     def generate_expire_date(self):
         return datetime.datetime.now() + datetime.timedelta(days=2)
 
+    def cleanup_expired_articles(self):
+        """Remove expired articles from the database"""
+        try:
+            self.cursor.execute('''
+                DELETE FROM Articles 
+                WHERE expire_date < datetime('now')
+            ''')
+            self.db_conn.commit()
+        except sqlite3.Error as e:
+            print(f"Error cleaning up expired articles: {e}")
+
     def add_article(
         self,
         url: str,
@@ -84,6 +95,10 @@ class AnalysisCache:
         show_bias: Optional[bool] = True
     ) -> bool:
         try:
+            # First cleanup expired articles
+            self.cleanup_expired_articles()
+            
+            # Then proceed with adding new article
             self.cursor.execute('''
                 INSERT INTO Articles (
                     url, factuality, factuality_description, bias,
@@ -102,13 +117,12 @@ class AnalysisCache:
             ))
             
             self.db_conn.commit()
-            success = True
-
+            return True
         except sqlite3.IntegrityError:
-            # URL already exists
-            success = False
-        
-        return success
+            return False
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return False
 
     def close(self):
         self.db_conn.close()

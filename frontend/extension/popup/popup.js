@@ -4,7 +4,6 @@ setPayBannerVisibility(false);
 let user = {};
 extpay.onPaid.addListener(currentUser => {
     user = currentUser;
-    console.log(user);
 
     if (canUse(user)) {
         showLoadingScreen();
@@ -207,10 +206,7 @@ function moveCarousel(type, direction) {
 }
 
 async function startAnalyzing(tabId, url, content) {
-    console.log(tabId, url, content)
     let jsonResult = undefined;
-
-    console.log(url);
 
     if (url.startsWith("https://www.youtube.com/watch")) {
         const formData = new FormData();
@@ -236,7 +232,6 @@ async function startAnalyzing(tabId, url, content) {
     }
 
     const analysis = await jsonResult.json();
-    console.log(analysis)
 
     if (analysis == undefined || analysis == null) {
         document.getElementById('loading-text').textContent = "Analysis Failed";
@@ -271,7 +266,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 document.addEventListener('DOMContentLoaded', async () => {
     extpay.getUser().then(async currentUser => {
         user = currentUser;
-        console.log(user);
         
         if (user.email) {
             document.getElementById('login-button').style.display = 'none';
@@ -309,7 +303,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     collapsibles[i].addEventListener('click', function () {
                         this.classList.toggle('active');
                         const content = this.nextElementSibling;
-                        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                        if (content) {
+                            // Toggle display based on current state
+                            if (content.style.display == "block" || content.style.display == "") {
+                                content.style.display = "none";
+                            } else {
+                                content.style.display = "block";
+                            }
+                        } else {
+                            console.error('No content element found for collapsible:', this);
+                        }
                     });
                 }
 
@@ -359,3 +362,47 @@ document.getElementById("freetrial-button").addEventListener("click", () => {
 document.getElementById("login-button").addEventListener("click", () => {
     extpay.openLoginPage();
 });
+
+
+
+/* CHAT FEATURE */
+document.addEventListener("DOMContentLoaded", ()=>{
+    chrome.runtime.sendMessage({
+        action: "popup_opened"
+    });
+})
+
+function displayChatMessages(messages) {
+    const chatMessagesContainer = document.getElementById('chatMessages');
+    chatMessagesContainer.innerHTML = ''; // Clear existing messages
+  
+    messages.forEach(message => {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('chat-message', message.role);
+      messageElement.textContent = message.message;
+      chatMessagesContainer.appendChild(messageElement);
+    });
+  
+    // Scroll to the bottom of the chat
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+}
+
+
+const inputBox = document.getElementById("chatInput");
+document.getElementById("chatSend").addEventListener("click", () => {
+    let val = inputBox.value;
+    inputBox.value = "";
+
+    chrome.runtime.sendMessage({
+        action: "sendChatMessage", 
+        message: val
+    });
+});
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.action === "chat_history_update") {
+            displayChatMessages(request.data);
+        }
+    }
+);
