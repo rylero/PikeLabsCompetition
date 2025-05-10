@@ -108,6 +108,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 		id: "analyze",
 		title: "Analyze Article",
 		type: 'normal',
+        contexts: ["selection", "page"]
 	});
 });
 
@@ -117,7 +118,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
 
     let jsonResult = undefined;
 
-    if (url.startsWith("https://www.youtube.com/watch")) {
+    if (url.startsWith("https://www.youtube.com/watch") && !item.selectionText) {
         const formData = new FormData();
         formData.append("url", url);
 
@@ -128,7 +129,10 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
             return null;
         });
     } else {
-        let text = collectArticleText(tab.id);
+        let text = info.selectionText;
+        if (!text) {
+            text = collectArticleText(tab.id);
+        }
         
         if (!text) {
             returen;

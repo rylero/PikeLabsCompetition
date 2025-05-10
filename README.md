@@ -6,7 +6,8 @@
 
 ### Possible Features / TODOs
 - [ ] Figure out wrong url issue (extension grabs article from not current tab, possibly switch cache to use url instead of tabid)
-- [ ] Add feature to analze text selected in context menu
+- [x] Add feature to analze text selected in context menu (Ryan)
+- [ ] Fix context menu selection so it doesnt mess up caching data
 - [ ] Improve Text grabbing functionality
 - [ ] Fix bug where bias and factuality descriptions don't display
 - [ ] Fix inital article click where it says "No article text found on this page" (Shaun)
