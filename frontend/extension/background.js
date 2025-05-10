@@ -52,6 +52,7 @@ let newsSites = [
     "bbc.com",
     "reuters.com",
     "apnews.com",
+    "npr.org"
 ];
 
 // Listen for tab updates

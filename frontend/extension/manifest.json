@@ -24,11 +24,5 @@
             "css": ["content.css"],
             "js": ["content.js"]
         }
-    ],
-    "web_accessible_resources": [
-    {
-      "resources": [ "chaticon.svg" ],
-      "matches": [ "https://*/*" ]
-    }
-  ]
+    ]
 }
