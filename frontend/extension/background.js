@@ -71,27 +71,25 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
             }
         })
         if (isNews) {
-            console.log("News site openened");
+            const formData = new FormData();
+            formData.append("url", tab.url);
+            formData.append("text", text);
+
+            jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+                method: "POST",
+                body: formData,
+            }).catch((err) => {
+                return null;
+            });
+
+            const analysis = await jsonResult.json();
+
+            if (analysis == undefined || analysis == null) {
+                return;
+            }
+
+            chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
         }
-
-        const formData = new FormData();
-        formData.append("url", tab.url);
-        formData.append("text", text);
-
-        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
-            method: "POST",
-            body: formData,
-        }).catch((err) => {
-            return null;
-        });
-
-        const analysis = await jsonResult.json();
-
-        if (analysis == undefined || analysis == null) {
-            return;
-        }
-
-        chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
     }
 });
 
