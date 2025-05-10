@@ -30,7 +30,6 @@ async function collectArticleText(tabId) {
                 }
             }
         });
-        console.log(result);
 
         if (result && result.length > 0 && result[0].result) {
             await chrome.storage.local.set({ [`article_${tabId}`]: result[0].result });
@@ -156,3 +155,66 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
 
     chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
 });
+
+
+
+/* CHAT FEATURE */
+// let webSocket = null;
+
+// function connect() {
+//   webSocket = new WebSocket('wss://example.com/ws');
+
+//   webSocket.onopen = (event) => {
+//     console.log('websocket open');
+//     keepAlive();
+//   };
+
+//   webSocket.onmessage = (event) => {
+//     console.log(`websocket received message: ${event.data}`);
+//   };
+
+//   webSocket.onclose = (event) => {
+//     console.log('websocket connection closed');
+//     webSocket = null;
+//   };
+// }
+
+// function keepAlive() {
+//     const keepAliveIntervalId = setInterval(
+//       () => {
+//         if (webSocket) {
+//           webSocket.send('keepalive');
+//         } else {
+//           clearInterval(keepAliveIntervalId);
+//         }
+//       },
+//       // Set the interval to 20 seconds to prevent the service worker from becoming inactive.
+//       20 * 1000 
+//     );
+//   }
+
+// function disconnect() {
+//   if (webSocket == null) {
+//     return;
+//   }
+//   webSocket.close();
+// }
+
+// chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+//     if (request.action === 'sendChatMessage') {
+//         if (webSocket != null) {
+//             webSocket.send(request.message);
+//         }
+//         return true;
+//     }
+//     return false;
+// });
+
+// chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+//     disconnect(); // disconnect for old tab
+//     connect(); // conncet for new tab
+// });
+
+// chrome.runtime.onSuspend.addListener(() => {
+//     disconnect(); // disconnect from websockets on service worker close    
+// });

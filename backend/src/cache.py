@@ -16,7 +16,7 @@ class AnalysisCache:
             WHERE type='table' AND name='Articles'
         """)
         
-        result =  self.cursor.fetchone()
+        result = self.cursor.fetchone()
         
         return result is not None
     
@@ -31,6 +31,7 @@ class AnalysisCache:
                 bias_description TEXT,
                 opposing_links TEXT,
                 agreement_links TEXT,
+                show_bias BOOLEAN,
                 expire_date TIMESTAMP
             )
         ''')
@@ -40,7 +41,7 @@ class AnalysisCache:
     def find_article_by_url(self, url: str) -> Optional[dict]:
         self.cursor.execute('''
             SELECT id, url, factuality, factuality_description, 
-                bias, bias_description, opposing_links, agreement_links, expire_date
+                bias, bias_description, opposing_links, agreement_links, show_bias, expire_date
             FROM Articles 
             WHERE url = ?
         ''', (url,))
@@ -63,7 +64,8 @@ class AnalysisCache:
             'bias': result[4],
             'bias_description': result[5],
             'opposing_links': json.loads(result[6]) if result[6] else [],
-            'agreement_links': json.loads(result[7]) if result[7] else []
+            'agreement_links': json.loads(result[7]) if result[7] else [],
+            'show_bias': bool(result[8]),
         }
         return article
     
@@ -78,14 +80,15 @@ class AnalysisCache:
         bias: Optional[float] = None,
         bias_description: Optional[str] = None,
         opposing_links: Optional[List[str]] = None,
-        agreement_links: Optional[List[str]] = None
+        agreement_links: Optional[List[str]] = None,
+        show_bias: Optional[bool] = True
     ) -> bool:
         try:
             self.cursor.execute('''
                 INSERT INTO Articles (
                     url, factuality, factuality_description, bias,
-                    bias_description, opposing_links, agreement_links, expire_date
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    bias_description, opposing_links, agreement_links, show_bias, expire_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 url,
                 factuality,
@@ -94,6 +97,7 @@ class AnalysisCache:
                 bias_description,
                 json.dumps(opposing_links) if opposing_links else None,
                 json.dumps(agreement_links) if agreement_links else None,
+                show_bias,
                 self.generate_expire_date()
             ))
             

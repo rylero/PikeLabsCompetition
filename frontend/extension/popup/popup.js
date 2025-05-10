@@ -70,7 +70,12 @@ function showReport(data) {
     document.getElementById("credibility-content").textContent = data.factuality_description;
     document.getElementById("bias-content").textContent = data.bias_description;
 
+    if (data["show_bias"] == false) {
+        document.getElementById("bias-gauge-container").style.display = "none";
+    }
+
     const agreeContainer = document.getElementById("agreeingInner");
+    agreeContainer.innerHTML = "";
     data.agreement_links.forEach((d) => {
         const a = document.createElement("a")
         a.href = d.link;
@@ -82,6 +87,7 @@ function showReport(data) {
     })
 
     const disagreeContainer = document.getElementById("disagreeingInner");
+    disagreeContainer.innerHTML = "";
     data.opposing_links.forEach((d) => {
         const a = document.createElement("a")
         a.href = d.link;
@@ -257,6 +263,10 @@ function canUse(user) {
     const sevenDays = 1000*60*60*24*7;
     return user.paid || (user.trialStartedAt && (now - user.trialStartedAt) < sevenDays);
 }
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    showLoadingScreen();
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     extpay.getUser().then(async currentUser => {

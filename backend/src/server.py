@@ -55,6 +55,7 @@ async def generate_report(url: Annotated[str, Form()], text: Annotated[str, Form
         data["bias_description"],
         data["opposing_links"],
         data["agreement_links"],
+        data["show_bias"],
     )
 
     return data
@@ -81,6 +82,7 @@ async def get_captions(url: Annotated[str, Form()]):
         data["bias_description"],
         data["opposing_links"],
         data["agreement_links"],
+        data["show_bias"],
     )
 
     return data

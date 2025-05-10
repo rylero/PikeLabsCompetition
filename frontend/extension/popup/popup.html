@@ -33,7 +33,7 @@
   </div>
   <div class="report">
     <div class="gauge-container">
-        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;" id="bias-gauge-container">
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;" id="bias-gauge-container">
       <h3 class="gauge-title">Political Bias</h3>
       <div class="gauge">
         <canvas id="biasGauge"></canvas>
@@ -71,6 +71,16 @@
         </div>
         <button class="carousel-arrow left" id="agree-left">‹</button>
         <button class="carousel-arrow right" id="agree-right">›</button>
+      </div>
+    </div>
+    <div class="chat-section">
+      <h3>AI Chat</h3>
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Ask about the article or bias...">
+          <button id="chatSend">Send</button>
+        </div>
       </div>
     </div>
   </div>
