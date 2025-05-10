@@ -9,8 +9,9 @@
 - [x] Add feature to analze text selected in context menu (Ryan)
 - [ ] Fix context menu selection so it doesnt mess up caching data
 - [ ] Improve Text grabbing functionality
-- [ ] Fix bug where bias and factuality descriptions don't display
-- [ ] Fix inital article click where it says "No article text found on this page" (Shaun)
+- [x] Fix bug where bias and factuality descriptions don't display
+- [ ] Fix bug where bias and factuality decsriptions arent collapsible
+- [x] Fix inital article click where it says "No article text found on this page" (Shaun)
 - [ ] Select the context menu for text grabbing
 - [ ] Better loading menu / fix flow errors
 - [ ] Cleaner UI
