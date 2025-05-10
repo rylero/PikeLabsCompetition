@@ -8,7 +8,8 @@
 - [ ] Figure out wrong url issue (extension grabs article from not current tab, possibly switch cache to use url instead of tabid)
 - [x] Add feature to analze text selected in context menu (Ryan)
 - [ ] Fix context menu selection so it doesnt mess up caching data
-- [ ] Improve Text grabbing functionality
+- [x] Improve Text grabbing functionality
+- [ ] App doesnt switch to new tab on tab close
 - [x] Fix bug where bias and factuality descriptions don't display
 - [ ] Fix bug where bias and factuality decsriptions arent collapsible
 - [x] Fix inital article click where it says "No article text found on this page" (Shaun)

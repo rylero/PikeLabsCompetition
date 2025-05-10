@@ -3,15 +3,15 @@
     "description": "Scans articles",
     "version": "1.0",
     "manifest_version": 3,
-    "permissions": ["activeTab", "scripting", "storage", "contextMenus", "tabs"],
+    "permissions": ["activeTab", "scripting", "storage", "contextMenus", "tabs", "sidePanel"],
     "background": {
         "service_worker": "background.js"
     },
     "host_permissions": [
       "https://*/*"
     ],
-    "action": {
-        "default_popup": "./popup/popup.html"
+    "side_panel": {
+        "default_path": "popup/popup.html"
     },
     "content_scripts": [
         {
