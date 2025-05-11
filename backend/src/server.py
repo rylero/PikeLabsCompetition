@@ -79,9 +79,9 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
     url = initialData["url"]
     text = initialData["text"]
 
-    chatHistory = [{
+    messages = [{
                 "role": "system",
-                "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries."
+                "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries. You also have acess to a search tool but try to avoid using it as much as possible as its very slow. If the user asks you to research something then use the tool."
             },
             {
                 "role": "user",
@@ -94,15 +94,46 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         if (data == "keepalive"):
             continue
         
-        chatHistory.append({
+        messages.append({
             "role": "user",
             "content": data
         })
 
         response = grokClient.chat.completions.create(
             model="grok-3-mini-fast",
-            messages=chatHistory
+            tools=tools_definition,
+            tool_choice="auto",
+            messages=messages
         )
-        chatHistory.append(response.choices[0].message)
+
+        print(messages)
+
+        messages.append(response.choices[0].message)
+
+        while response.choices[0].message.tool_calls:
+            i = 1
+            for tool_call in response.choices[0].message.tool_calls:
+
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
+
+                result = tools_map[function_name](**function_args)
+
+                messages.append(
+                    {
+                        "role": "tool",
+                        "content": result,
+                        "tool_call_id": tool_call.id  # tool_call.id supplied in Grok's response
+                    }
+                )
+                i+=1
+
+            response = grokClient.chat.completions.create(
+                model="grok-3-latest",
+                messages=messages,
+                tools=tools_definition,
+                tool_choice="auto"
+            )
+            messages.append(response.choices[0].message)
 
         await websocket.send_text(response.choices[0].message.content)
