@@ -81,7 +81,7 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
 
     chatHistory = [{
                 "role": "system",
-                "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries"
+                "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries."
             },
             {
                 "role": "user",

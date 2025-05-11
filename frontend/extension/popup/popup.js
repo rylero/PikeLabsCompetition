@@ -259,7 +259,7 @@ function canUse(user) {
     return user.paid || (user.trialStartedAt && (now - user.trialStartedAt) < sevenDays);
 }
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+chrome.tabs.onActivated.addListener(async (tabId, changeInfo, tab) => {
     showLoadingScreen();
 });
 
@@ -379,7 +379,7 @@ function displayChatMessages(messages) {
     messages.forEach(message => {
       const messageElement = document.createElement('div');
       messageElement.classList.add('chat-message', message.role);
-      messageElement.textContent = message.message;
+      messageElement.innerHTML = marked.parse(message.message);
       chatMessagesContainer.appendChild(messageElement);
     });
   
