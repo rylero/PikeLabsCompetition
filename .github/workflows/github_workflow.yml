@@ -68,7 +68,7 @@ jobs:
       - name: 'Build and Push Container'
         working-directory: ./backend
         run: |-
-          DOCKER_TAG="us-central1-docker.pkg.dev/newsapp-457901/politiscan:${{ github.sha }}"
+          DOCKER_TAG="us-central1-docker.pkg.dev/newsapp-457901/politiscan-image:${{ github.sha }}"
           docker buildx build --tag "${DOCKER_TAG}" --build-arg GROK_API="${{ secrets.GROK_API }}" --build-arg TAVILY_API_KEY="${{ secrets.TAVILY_API }}" .
           docker push "${DOCKER_TAG}"
           
@@ -77,7 +77,7 @@ jobs:
         with:
           service: '${{ env.SERVICE }}'
           region: 'us-central1'
-          image: 'us-central1-docker.pkg.dev/newsapp-457901/politiscan:${{ github.sha }}'
+          image: 'us-central1-docker.pkg.dev/newsapp-457901/politiscan-image:${{ github.sha }}'
           env_vars: 'GROK_API=${{ secrets.GROK_API }},TAVILY_API_KEY=${{ secrets.TAVILY_API_KEY }}'
           flags: '--allow-unauthenticated'
 
