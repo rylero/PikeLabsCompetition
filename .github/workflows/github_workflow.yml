@@ -78,6 +78,6 @@ jobs:
           service: '${{ env.SERVICE }}'
           region: 'us-central1'
           image: 'us-central1-docker.pkg.dev/newsapp-457901/politiscan/politiscan-image:${{ github.sha }}'
-          env_vars: 'GROK_API=${{ secrets.GROK_API }},TAVILY_API_KEY=${{ secrets.TAVILY_API_KEY }}'
+          env_vars: 'GROK_API=${{ secrets.GROK_API }},TAVILY_API_KEY=${{ secrets.TAVILY_API }}'
           flags: '--allow-unauthenticated'
 
