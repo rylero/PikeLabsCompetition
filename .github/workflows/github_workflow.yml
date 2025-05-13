@@ -37,7 +37,7 @@ on:
 env:
   PROJECT_ID: 'newsapp-457901' 
   REGION: 'us-central1'
-  SERVICE: '1092122045742-compute' 
+  SERVICE: 'poltiscan-service' 
   ARTIFACT_REPO: 'politiscan'
 
 jobs:
