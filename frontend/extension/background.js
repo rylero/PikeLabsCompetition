@@ -82,8 +82,8 @@ async function analyzeArticle(url, text) {
         if (text) formData.append("text", text);
 
         const endpoint = url.startsWith("https://www.youtube.com/watch") 
-            ? "http://0.0.0.0:8000/generate_report_from_youtube"
-            : "http://0.0.0.0:8000/generate_report";
+            ? "https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube"
+            : "https://poltiscan-service-1092122045742.us-central1.run.app/generate_report";
 
         const response = await fetchWithRetry(endpoint, {
             method: "POST",
@@ -143,7 +143,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
         const formData = new FormData();
         formData.append("url", url);
 
-        jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
+        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube", {
             method: "POST",
             body: formData,
         }).catch((err) => {
@@ -163,7 +163,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
         formData.append("url", url);
         formData.append("text", text);
 
-        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report", {
             method: "POST",
             body: formData,
         }).catch((err) => {
@@ -194,7 +194,7 @@ let chatHistory = [];
 
 function connect() {
     console.log("connect")
-  webSocket = new WebSocket('ws://localhost:8000/chat');
+  webSocket = new WebSocket('wss://poltiscan-service-1092122045742.us-central1.run.app/chat');
   chatHistory = [];
 
   webSocket.onopen = async (event) => {

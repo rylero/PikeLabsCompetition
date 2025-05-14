@@ -212,7 +212,7 @@ async function startAnalyzing(tabId, url, content) {
         const formData = new FormData();
         formData.append("url", url);
 
-        jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
+        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube", {
             method: "POST",
             body: formData,
         }).catch((err) => {
@@ -223,7 +223,7 @@ async function startAnalyzing(tabId, url, content) {
         formData.append("url", url);
         formData.append("text", content);
 
-        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report", {
             method: "POST",
             body: formData,
         }).catch((err) => {
