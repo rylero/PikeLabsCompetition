@@ -12,36 +12,6 @@ extpay.getUser().then(currentUser => {
 })
 
 
-// Function to collect article text
-async function collectArticleText(tabId) {
-    try {
-        const result = await chrome.scripting.executeScript({
-            target: { tabId: tabId },
-            func: function() {
-                try {
-                    // const article = document.querySelector('main,article');
-                    // if (article) {
-                    return Array.from(document.querySelectorAll('p,article>div')).map(p => p.innerText).join('\n\n');
-                    // }
-                    // return null;
-                } catch (err) {
-                    console.error('Error in content script:', err);
-                    return null;
-                }
-            }
-        });
-
-        if (result && result.length > 0 && result[0].result) {
-            await chrome.storage.local.set({ [`article_${tabId}`]: result[0].result });
-            return result[0].result;
-        }
-        return null;
-    } catch (err) {
-        console.error('Failed to collect article text:', err);
-        return null;
-    }
-}
-
 let newsSites = [
     "newsweek.com",
     "foxnews.com",
@@ -82,8 +52,8 @@ async function analyzeArticle(url, text) {
         if (text) formData.append("text", text);
 
         const endpoint = url.startsWith("https://www.youtube.com/watch") 
-            ? "https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube"
-            : "https://poltiscan-service-1092122045742.us-central1.run.app/generate_report";
+            ? "http://0.0.0.0:8000/generate_report_from_youtube"
+            : "http://0.0.0.0:8000/generate_report";
 
         const response = await fetchWithRetry(endpoint, {
             method: "POST",
@@ -93,6 +63,13 @@ async function analyzeArticle(url, text) {
         const analysis = await response.json();
         if (!analysis) throw new Error("No analysis data received");
 
+        // Add expiration timestamp (24 hours from now)
+        const storageData = {
+            data: analysis,
+            expires: Date.now() + (24 * 60 * 60 * 1000)
+        };
+
+        await chrome.storage.local.set({ [url]: storageData });
         return analysis;
     } catch (error) {
         console.error("Analysis failed:", error);
@@ -103,25 +80,13 @@ async function analyzeArticle(url, text) {
 // Listen for tab updates
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.url && !tab.url.startsWith('chrome://')) {
-        const text = await collectArticleText(tabId);
-        if (!text || !isNewsSite(tab.url)) return;
+        if (!isNewsSite(tab.url)) return;
 
-        const analysis = await analyzeArticle(tab.url, text);
+        const analysis = await analyzeArticle(tab.url, "");
         if (analysis) {
-            chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
+            // Storage is now handled in analyzeArticle
         }
     }
-});
-
-// Listen for messages from popup
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-    if (request.action === 'getArticleText') {
-        collectArticleText(request.tabId).then(text => {
-            sendResponse({ text: text });
-        });
-        return true; // Required for async response
-    }
-    return false; // Return false if not handling the message
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -133,37 +98,30 @@ chrome.runtime.onInstalled.addListener(async () => {
 	});
 });
 
-chrome.contextMenus.onClicked.addListener(async (item, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     let url = tab.url;
     let tabId = tab.id;
 
     let jsonResult = undefined;
 
-    if (url.startsWith("https://www.youtube.com/watch") && !item.selectionText) {
+    if (url.startsWith("https://www.youtube.com/watch") && !info.selectionText) {
         const formData = new FormData();
         formData.append("url", url);
 
-        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube", {
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
             method: "POST",
             body: formData,
         }).catch((err) => {
             return null;
         });
     } else {
-        let text = info.selectionText;
-        if (!text) {
-            text = collectArticleText(tab.id);
-        }
+        let text = info.selectionText || "";
         
-        if (!text) {
-            returen;
-        }
-
         const formData = new FormData();
         formData.append("url", url);
         formData.append("text", text);
 
-        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report", {
+        jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
             method: "POST",
             body: formData,
         }).catch((err) => {
@@ -177,7 +135,13 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
         return;
     }
 
-    chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
+    // Add expiration timestamp (24 hours from now)
+    const storageData = {
+        data: analysis,
+        expires: Date.now() + (24 * 60 * 60 * 1000)
+    };
+
+    chrome.storage.local.set({ [url]: storageData });
 });
 
 async function getCurrentTab() {
@@ -194,7 +158,7 @@ let chatHistory = [];
 
 function connect() {
     console.log("connect")
-  webSocket = new WebSocket('wss://poltiscan-service-1092122045742.us-central1.run.app/chat');
+  webSocket = new WebSocket('ws://0.0.0.0:8000/chat');
   chatHistory = [];
 
   webSocket.onopen = async (event) => {
@@ -202,11 +166,9 @@ function connect() {
     keepAlive();
 
     let tab = await getCurrentTab();
-    let content = await collectArticleText(tab.id);
-
     let data = {
         url: tab.url,
-        text: content
+        text: ""
     }
     webSocket.send(JSON.stringify(data));
   };

@@ -208,49 +208,63 @@ function moveCarousel(type, direction) {
 async function startAnalyzing(tabId, url, content) {
     let jsonResult = undefined;
 
-    if (url.startsWith("https://www.youtube.com/watch")) {
-        const formData = new FormData();
-        formData.append("url", url);
+    try {
+        if (url.startsWith("https://www.youtube.com/watch")) {
+            const formData = new FormData();
+            formData.append("url", url);
 
-        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube", {
-            method: "POST",
-            body: formData,
-        }).catch((err) => {
-            return null;
-        });
-    } else {
-        const formData = new FormData();
-        formData.append("url", url);
-        formData.append("text", content);
+            jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
+                method: "POST",
+                body: formData,
+            });
+        } else {
+            const formData = new FormData();
+            formData.append("url", url);
+            formData.append("text", content || "");
 
-        jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report", {
-            method: "POST",
-            body: formData,
-        }).catch((err) => {
-            return null;
-        });
+            jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+                method: "POST",
+                body: formData,
+            });
+        }
+
+        if (!jsonResult.ok) {
+            const errorData = await jsonResult.json();
+            throw new Error(errorData.detail || 'Analysis failed');
+        }
+
+        const analysis = await jsonResult.json();
+
+        if (analysis == undefined || analysis == null) {
+            document.getElementById('loading-text').textContent = "Analysis Failed";
+            return;
+        }
+
+        // Add expiration timestamp (24 hours from now)
+        const storageData = {
+            data: analysis,
+            expires: Date.now() + (24 * 60 * 60 * 1000)
+        };
+
+        chrome.storage.local.set({ [url]: storageData });
+
+        setupReportPage();
+
+        // Collapsible sections
+        const collapsibles = document.getElementsByClassName('collapsible');
+        for (let i = 0; i < collapsibles.length; i++) {
+            collapsibles[i].addEventListener('click', function () {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            });
+        }
+
+        showReport(analysis);
+    } catch (error) {
+        console.error('Analysis error:', error);
+        document.getElementById('loading-text').textContent = error.message || "Analysis Failed";
     }
-
-    const analysis = await jsonResult.json();
-
-    if (analysis == undefined || analysis == null) {
-        document.getElementById('loading-text').textContent = "Analysis Failed";
-    }
-    chrome.storage.local.set({ [`analysis_${tabId}`]: analysis });
-
-    setupReportPage();
-
-    // Collapsible sections
-    const collapsibles = document.getElementsByClassName('collapsible');
-    for (let i = 0; i < collapsibles.length; i++) {
-        collapsibles[i].addEventListener('click', function () {
-            this.classList.toggle('active');
-            const content = this.nextElementSibling;
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        });
-    }
-
-    showReport(analysis);
 }
 
 function canUse(user) {
@@ -292,9 +306,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-            // first check ai analyzsis
-            const storedAnalysis = await chrome.storage.local.get([`analysis_${tab.id}`]);
-            if (storedAnalysis[`analysis_${tab.id}`]) {
+            // Check for stored analysis
+            const storedData = await chrome.storage.local.get([tab.url]);
+            const storedAnalysis = storedData[tab.url];
+
+            if (storedAnalysis && storedAnalysis.expires > Date.now()) {
                 setupReportPage();
 
                 // Collapsible sections
@@ -316,32 +332,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 }
 
-                showReport(storedAnalysis[`analysis_${tab.id}`]);
-            }
-
-            // Second try to get stored text
-            const storedText = await chrome.storage.local.get([`article_${tab.id}`]);
-
-            if (storedText[`article_${tab.id}`]) {
-                document.getElementById('loading-text').textContent = "Article Text Loaded";
-                startAnalyzing(tab.url, storedText[`article_${tab.id}`]);
+                showReport(storedAnalysis.data);
             } else {
-                // If no stored text, request it from background script
-                const response = await chrome.runtime.sendMessage({
-                    action: 'getArticleText',
-                    tabId: tab.id
-                });
-
-                if (response && response.text) {
-                    document.getElementById('loading-text').textContent = "Article Text Loaded";
-                    startAnalyzing(tab.id, tab.url, response.text);
+                if (tab.url.startsWith("https://www.youtube.com/watch")) {
+                    document.getElementById('loading-text').textContent = 'Analyzing Youtube Captions';
+                    startAnalyzing(tab.id, tab.url, null);
                 } else {
-                    if (tab.url.startsWith("https://www.youtube.com/watch")) {
-                        document.getElementById('loading-text').textContent = 'Analyzing Youtube Captions';
-                        startAnalyzing(tab.id, tab.url, null);
-                    } else {
-                        document.getElementById('loading-text').textContent = 'No article text found on this page.';
-                    }
+                    document.getElementById('loading-text').textContent = 'Analyzing page...';
+                    startAnalyzing(tab.id, tab.url, "");
                 }
             }
         } catch (err) {
@@ -405,4 +403,4 @@ chrome.runtime.onMessage.addListener(
             displayChatMessages(request.data);
         }
     }
-);
+); 

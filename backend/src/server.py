@@ -8,6 +8,7 @@ from transcription import get_transcription
 from cache import AnalysisCache
 from ai import grokClient, tools_definition, tools_map, getArticleAnalysis
 from chat import ChatMessageHistoryDB
+from search import get_article_text
 
 app = fastapi.FastAPI()
 analysis_cache = AnalysisCache()
@@ -41,6 +42,15 @@ async def handle_analysis(url: str, text: str = None):
         cached_analysis.pop("id")
         cached_analysis.pop("url")
         return cached_analysis
+
+    if text == "":
+        try:
+            article_data = get_article_text(url)
+            if not article_data or not article_data.get('results'):
+                raise fastapi.HTTPException(status_code=422, detail="Could not extract article text")
+            text = article_data['results'][0]['raw_content']
+        except Exception as e:
+            raise fastapi.HTTPException(status_code=422, detail=f"Failed to extract article text: {str(e)}")
 
     data = getArticleAnalysis(url, text)
     if not data:

@@ -10,8 +10,8 @@ class SearchRequest(BaseModel):
 
 client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-def get_article_text(urls):
-    return client.extract(urls=urls, extract_depth="advanced")
+def get_article_text(url):
+    return client.extract(urls=url, extract_depth="advanced")
 
 def compress(data):
     s = ""

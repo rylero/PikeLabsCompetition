@@ -3,13 +3,10 @@
     "description": "Scans articles",
     "version": "1.0",
     "manifest_version": 3,
-    "permissions": ["activeTab", "scripting", "storage", "contextMenus", "tabs", "sidePanel"],
+    "permissions": ["activeTab", "storage", "contextMenus", "tabs", "sidePanel"],
     "background": {
         "service_worker": "background.js"
     },
-    "host_permissions": [
-      "https://*/*"
-    ],
     "side_panel": {
         "default_path": "popup/popup.html"
     },
