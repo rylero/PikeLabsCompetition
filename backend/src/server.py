@@ -3,6 +3,7 @@ import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 import json, time
 from fastapi.params import Form
+import asyncio
 
 from transcription import get_transcription
 from cache import AnalysisCache
@@ -85,65 +86,235 @@ async def get_captions(url: Annotated[str, Form()]):
 async def websocket_endpoint(websocket: fastapi.WebSocket):
     await websocket.accept()
 
+    # Wait for initial message
     initialData = await websocket.receive_json()
-    url = initialData["url"]
-    text = initialData["text"]
+    print("InitialData : " + str(initialData))
+    
+    # Handle initial connection
+    url = ""
+    text = ""
+    email = initialData.get("email", "anonymous")  # Get email or use anonymous as default
+    
+    if email == "anonymous":
+        print("AUTH FAILURE")
 
-    messages = [{
-                "role": "system",
-                "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries. You also have acess to a search tool but try to avoid using it as much as possible as its very slow. If the user asks you to research something then use the tool."
-            },
-            {
-                "role": "user",
-                "content": f"Link: {url} + \n + {text}",
-            }]
+    if initialData.get("type") == "new_article":
+        print("New Article")
+        url = initialData["data"]
+    else:
+        # Legacy format handling
+        url = initialData.get("url", "")
+        text = initialData.get("text", "")
 
-    while True:
-        data = await websocket.receive_text()
+    # Get article text if not provided
+    if not text:
+        try:
+            article_data = get_article_text(url)
+            if article_data and article_data.get('results'):
+                text = article_data['results'][0]['raw_content']
+            else:
+                text = "Could not extract article text"
+        except Exception as e:
+            text = f"Error extracting article text: {str(e)}"
 
-        if (data == "keepalive"):
-            continue
-        
-        messages.append({
+    chat_id = str(time.time())  # Unique chat ID for this session
+    current_sequence = 0  # Track the current sequence number
+    current_generation = None  # Track the current generation task
+
+    # Try to get existing messages from database
+    existing_messages = message_history.get_message_history(email, url)
+    if existing_messages:
+        messages = existing_messages
+    else:
+        # Initialize messages with system and initial user message
+        messages = [{
+            "role": "system",
+            "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries. You also have acess to a search tool but try to avoid using it as much as possible as its very slow. If the user asks you to research something then use the tool."
+        },
+        {
             "role": "user",
-            "content": data
-        })
+            "content": f"Link: {url}\n\nArticle Text:\n{text}",
+        }]
+        # Store initial messages in database
+        message_history.create_message_history(email, url, messages)
 
-        response = grokClient.chat.completions.create(
-            model="grok-3-mini-fast",
-            tools=tools_definition,
-            tool_choice="auto",
-            messages=messages
-        )
+    # Send initial chat history
+    await websocket.send_text(json.dumps({
+        "type": "history",
+        "chat_id": chat_id,
+        "sequence": current_sequence,
+        "data": {"messages": messages}
+    }))
 
-        print(messages)
+    async def generate_response(message_sequence: int, current_messages: list):
+        print(message_sequence, current_messages)
+        """Async function to generate response from Grok"""
+        try:
+            response = grokClient.chat.completions.create(
+                model="grok-3-mini-fast",
+                tools=tools_definition,
+                tool_choice="auto",
+                messages=current_messages
+            )
 
-        messages.append(response.choices[0].message)
-
-        while response.choices[0].message.tool_calls:
-            i = 1
-            for tool_call in response.choices[0].message.tool_calls:
-
-                function_name = tool_call.function.name
-                function_args = json.loads(tool_call.function.arguments)
-
-                result = tools_map[function_name](**function_args)
-
-                messages.append(
+            # Convert ChatCompletionMessage to dict
+            message_dict = {
+                "role": response.choices[0].message.role,
+                "content": response.choices[0].message.content,
+                "tool_calls": [
                     {
+                        "id": tool_call.id,
+                        "type": tool_call.type,
+                        "function": {
+                            "name": tool_call.function.name,
+                            "arguments": tool_call.function.arguments
+                        }
+                    } for tool_call in (response.choices[0].message.tool_calls or [])
+                ] if response.choices[0].message.tool_calls else None
+            }
+            current_messages.append(message_dict)
+
+            while message_dict.get("tool_calls"):
+                for tool_call in message_dict["tool_calls"]:
+                    function_name = tool_call["function"]["name"]
+                    function_args = json.loads(tool_call["function"]["arguments"])
+
+                    result = tools_map[function_name](**function_args)
+
+                    current_messages.append({
                         "role": "tool",
                         "content": result,
-                        "tool_call_id": tool_call.id  # tool_call.id supplied in Grok's response
-                    }
+                        "tool_call_id": tool_call["id"]
+                    })
+
+                response = grokClient.chat.completions.create(
+                    model="grok-3-mini-fast",
+                    messages=current_messages,
+                    tools=tools_definition,
+                    tool_choice="auto"
                 )
-                i+=1
 
-            response = grokClient.chat.completions.create(
-                model="grok-3-latest",
-                messages=messages,
-                tools=tools_definition,
-                tool_choice="auto"
+                # Convert final response to dict
+                message_dict = {
+                    "role": response.choices[0].message.role,
+                    "content": response.choices[0].message.content,
+                    "tool_calls": [
+                        {
+                            "id": tool_call.id,
+                            "type": tool_call.type,
+                            "function": {
+                                "name": tool_call.function.name,
+                                "arguments": tool_call.function.arguments
+                            }
+                        } for tool_call in (response.choices[0].message.tool_calls or [])
+                    ] if response.choices[0].message.tool_calls else None
+                }
+                current_messages.append(message_dict)
+
+            # Only send if this is still the current sequence
+            if message_sequence == current_sequence:
+                # Update messages in database
+                message_history.update_message_history(email, url, current_messages)
+                
+                await websocket.send_text(json.dumps({
+                    "type": "message",
+                    "chat_id": chat_id,
+                    "sequence": message_sequence,
+                    "data": {
+                        "message": message_dict["content"],
+                        "role": message_dict["role"]
+                    }
+                }))
+        except Exception as e:
+            print(f"Error in generate_response: {e}")
+            # Only send error if this is still the current sequence
+            if message_sequence == current_sequence:
+                await websocket.send_text(json.dumps({
+                    "type": "error",
+                    "chat_id": chat_id,
+                    "sequence": message_sequence,
+                    "data": {"error": str(e)}
+                }))
+
+    while True:
+        try:
+            data = await websocket.receive_text()
+
+            if data == "keepalive":
+                continue
+
+            # Parse the incoming message
+            try:
+                message_data = json.loads(data)
+                message_type = message_data.get("type", "message")
+                message_content = message_data.get("data", "")
+                message_sequence = message_data.get("sequence", 0)
+            except json.JSONDecodeError:
+                # Handle legacy format
+                message_type = "message"
+                message_content = data
+                message_sequence = current_sequence + 1
+
+            # If this is an old sequence, ignore it
+            if message_sequence < current_sequence:
+                continue
+
+            # Update current sequence
+            current_sequence = message_sequence
+
+            if message_type == "new_article":
+                print("New Article")
+                # Cancel any ongoing generation
+                if current_generation:
+                    current_generation = None
+                
+                # Reset sequence for new article
+                current_sequence = 0
+                url = message_content
+                
+                # Try to get existing messages for new article
+                existing_messages = message_history.get_message_history(email, url)
+                if existing_messages:
+                    messages = existing_messages
+                else:
+                    messages = [{
+                        "role": "system",
+                        "content": "Your are an ai chat bot that helps users better understand the news. Users will first give you a url and text and you will then need to respond to queries. You also have acess to a search tool but try to avoid using it as much as possible as its very slow. If the user asks you to research something then use the tool."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Link: {url}\n\nArticle Text:\n{text}",
+                    }]
+                    # Store initial messages in database
+                    message_history.create_message_history(email, url, messages)
+                
+                await websocket.send_text(json.dumps({
+                    "type": "history",
+                    "chat_id": chat_id,
+                    "sequence": current_sequence,
+                    "data": {"messages": messages}
+                }))
+                continue
+
+            # Add user message to history
+            messages.append({
+                "role": "user",
+                "content": message_content
+            })
+            
+            # Update messages in database
+            message_history.update_message_history(email, url, messages)
+
+            # Start new generation task
+            current_generation = asyncio.create_task(
+                generate_response(current_sequence, messages.copy())
             )
-            messages.append(response.choices[0].message)
 
-        await websocket.send_text(response.choices[0].message.content)
+        except Exception as e:
+            print(f"Error in websocket loop: {e}")
+            await websocket.send_text(json.dumps({
+                "type": "error",
+                "chat_id": chat_id,
+                "sequence": current_sequence,
+                "data": {"error": str(e)}
+            }))

@@ -5,8 +5,8 @@ export const analyzeArticle = async (url, text) => {
         if (text) formData.append("text", text);
 
         const endpoint = url.startsWith("https://www.youtube.com/watch") 
-            ? "http://0.0.0.0:8000/generate_report_from_youtube"
-            : "http://0.0.0.0:8000/generate_report";
+            ? "https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube"
+            : "https://poltiscan-service-1092122045742.us-central1.run.app/generate_report";
 
         const response = await fetch(endpoint, {
             method: "POST",

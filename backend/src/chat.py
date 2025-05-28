@@ -38,15 +38,15 @@ class ChatMessageHistoryDB:
             SELECT id, email, url, messages FROM ChatHistory WHERE email=? AND url=?
         ''', (email,url,))
         
-        result = self.cursor.fetchone()
+        result = cursor.fetchone()
         
         if result:
-            article = json.loads(result[1])
+            article = json.loads(result[3])
             return article
         
         return None
     
-    def create_messsage_history(
+    def create_message_history(
         self, email, url, messages
     ) -> int:
         cursor = self.db_conn.cursor()

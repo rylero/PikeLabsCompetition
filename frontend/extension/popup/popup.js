@@ -213,7 +213,7 @@ async function startAnalyzing(tabId, url, content) {
             const formData = new FormData();
             formData.append("url", url);
 
-            jsonResult = await fetch("http://0.0.0.0:8000/generate_report_from_youtube", {
+            jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report_from_youtube", {
                 method: "POST",
                 body: formData,
             });
@@ -222,7 +222,7 @@ async function startAnalyzing(tabId, url, content) {
             formData.append("url", url);
             formData.append("text", content || "");
 
-            jsonResult = await fetch("http://0.0.0.0:8000/generate_report", {
+            jsonResult = await fetch("https://poltiscan-service-1092122045742.us-central1.run.app/generate_report", {
                 method: "POST",
                 body: formData,
             });
@@ -374,11 +374,25 @@ function displayChatMessages(messages) {
     const chatMessagesContainer = document.getElementById('chatMessages');
     chatMessagesContainer.innerHTML = ''; // Clear existing messages
   
-    messages.forEach(message => {
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('chat-message', message.role);
-      messageElement.innerHTML = marked.parse(message.message);
-      chatMessagesContainer.appendChild(messageElement);
+    // Skip the first two messages (system prompt and article link)
+    const displayMessages = messages.slice(2);
+  
+    displayMessages.forEach(message => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', message.role);
+        
+        // Format the message content
+        let content = Object.hasOwn(message, 'message') ? message.message : message.content;
+        console.log(message);
+        if (message.role == "tool") {
+            return
+        }
+        if (message.role === 'assistant') {
+            content = marked.parse(content);
+        }
+        
+        messageElement.innerHTML = content;
+        chatMessagesContainer.appendChild(messageElement);
     });
   
     // Scroll to the bottom of the chat
